@@ -1,0 +1,19 @@
+{
+  "name": "calendar-app",
+  "version": "1.0.0",
+  "description": "Calendar app",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "Electron",
+    "quick",
+    "start",
+    "tutorial",
+    "demo"
+  ],
+  "devDependencies": {
+    "electron": "^8.2.1"
+  }
+}

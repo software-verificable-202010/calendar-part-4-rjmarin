@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self';  script-src * data: https://ssl.gstatic.com 'unsafe-inline' 'unsafe-eval';">
+    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <link rel="stylesheet" type="text/css" href="../css/index.css">
+    <title>Calendar</title>
+  </head>
+  <body>
+    <div class="wrapper">
+  <main>
+    <div class="toolbar">
+      <div id="current-month" class="current-month"></div>
+    </div>
+    <div class="calendar">
+      <div class="calendar__header">
+        <div>mon</div>
+        <div>tue</div>
+        <div>wed</div>
+        <div>thu</div>
+        <div>fri</div>
+        <div>sat</div>
+        <div>sun</div>
+      </div>
+      <div id="calendar__month">
+    </div>
+    </div>
+    <div id="selects" class="selects">
+      <select id="select-month" name="month" class="" onchange="onChangeMonth()">
+      </select>
+    </div>
+    <div id="selects" class="selects">
+      <select id="select-year" name="year" class="" onchange="onChangeYear()">
+      </select>
+    
+    </div>
+  </main>
+</div>
+    <script type="text/javascript" src="../scripts/renderer.js"></script>
+  </body>
+</html>
