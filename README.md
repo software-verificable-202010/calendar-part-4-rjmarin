@@ -14,7 +14,7 @@ To clone and run this repository you'll need [Git](https://git-scm.com) and [Nod
 
 ```bash
 # Go into the repository
-cd electron-quick-start
+cd calendar-app
 # Install dependencies
 npm install
 # Run the app
