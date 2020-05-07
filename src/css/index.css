@@ -1,4 +1,4 @@
-
+@import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 /* WRAPPER */
 .wrapper {
     display: grid;
@@ -7,10 +7,14 @@
     width: 100vw; 
     height: 100vh;
   }
+  .navegation__week{
+    display: inline;
+    float: right;
+  }
   
   /* MAIN */
   
-
+  .calendar__hour,
   .calendar__week,
   .calendar__header {
     display: grid;
@@ -18,6 +22,10 @@
   }
   .calendar__week {
     grid-auto-rows: 100px;
+    text-align: right;
+  }
+  .calendar__hours {
+    grid-auto-rows: 50px;
     text-align: right;
   }
   
@@ -28,7 +36,8 @@
   }
   
   .calendar__day {
-    padding: 16px;
+    padding: 10px;
+    overflow: scroll;
   }
 
   .selects {
@@ -61,6 +70,7 @@
     font-family: Montserrat;
     font-weight: 100;
     color: #A8B2B9;
+    line-height: 1;
   }
   
   
@@ -98,6 +108,43 @@
   .weekend{
     background-color:rgba(165, 205, 241, 0.5);
   }
-  
+  .hours-calendar-week{
+    float:left;
+    width:1%; 
+    margin-top: 60px;
 
+  }
+  
+  span {
+    color: white;
+    background-color: white;
+  }
+  
+  a {
+    text-decoration: none;
+    display: inline-block;
+    padding: 8px 16px;
+  }
+  
+  a:hover {
+    background-color: #ddd;
+    color: black;
+  }
+  
+  .previous {
+    background-color: #f1f1f1;
+    color: black;
+  }
+  
+  .next {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .round {
+    border-radius: 50%;
+  }
  
+  .error{
+    color: red;
+  }

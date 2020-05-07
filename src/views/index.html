@@ -2,41 +2,53 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self';  script-src * data: https://ssl.gstatic.com 'unsafe-inline' 'unsafe-eval';">
-    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <script src="https://code.jquery.com/jquery-3.5.0.min.js"></script> 
     <link rel="stylesheet" type="text/css" href="../css/index.css">
     <title>Calendar</title>
   </head>
   <body>
     <div class="wrapper">
+    
   <main>
     <div class="toolbar">
       <div id="current-month" class="current-month"></div>
-    </div>
-    <div class="calendar">
-      <div class="calendar__header">
-        <div>mon</div>
-        <div>tue</div>
-        <div>wed</div>
-        <div>thu</div>
-        <div>fri</div>
-        <div>sat</div>
-        <div>sun</div>
+        <button class="btn" id="change-to-month">Month</button>
+        <button class="btn" id="change-to-week">Week</button>
+      <div id="navegation-week" class="navegation__week">
+        <a href="#"   id="prev-week" class="round" >&#8249;</a>
+        <a href="#"   id="next-week" class="round">&#8250;</a>
       </div>
-      <div id="calendar__month">
+    </div>
+    <div class="calendar" id="calendar">
+      <div id="hours-calendar-week"></div>
+      <div id="calendar-header" class="calendar__header m-auto">
+        <div id="monday">mon</div>
+        <div id="tuesday">tue</div>
+        <div id="wednesday">wed</div>
+        <div id="thursday">thu</div>
+        <div id="friday">fri</div>
+        <div id="saturday">sat</div>
+        <div id="sunday">sun</div>
+      </div>
+      <div id="calendar__month" class"m-auto">
     </div>
     </div>
-    <div id="selects" class="selects">
-      <select id="select-month" name="month" class="" onchange="onChangeMonth()">
-      </select>
+    <div id="navegation">
+      <div id="selects" class="selects">
+        <select id="select-month" name="month" onchange="onChangeMonth()">
+        </select>
+      </div>
+      <div id="selects" class="selects">
+        <select id="select-year" name="year"  onchange="onChangeYear()">
+        </select>
+      </div>
     </div>
-    <div id="selects" class="selects">
-      <select id="select-year" name="year" class="" onchange="onChangeYear()">
-      </select>
-    
-    </div>
+
+
   </main>
 </div>
     <script type="text/javascript" src="../scripts/renderer.js"></script>
   </body>
 </html>
+
+
