@@ -1,51 +1,51 @@
 var mysql = require('mysql');
 
-  function dbConnect(){
-    var connection =  mysql.createConnection({
-      host     : 'localhost',
-      user     : 'root',
-      password : 'password',
-      database : 'calendar'
+function dbConnect() {
+  var connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'password',
+    port: '3306',
+    database: 'calendar'
   });
-   connection.connect(function(error){
-    if(!!error){
+  connection.connect(function (error) {
+    if (!error) {
       return error;
     }
   });
-  connection.query('USE calendar', 
-  function (error, results) {
-    if (error) throw error;  
-  });
-  var exist = true;
-  connection.query('SHOW TABLES LIKE "Event"', 
-  function (error, results) {
-    if (error) {
-        exist = false;
-    }
-    exist = true;
-  });
-  if(!exist){
-    connection.query('CREATE TABLE Event  (title varchar(30), description varchar(200), start datetime, end datetime, color varchar(40))', 
-      function (error, results,fields) {
+  connection.query('USE calendar',
+    function (error) {
       if (error) throw error;
-      console.log(error, results);
-       
-    });  
-  }
+    });
   return connection;
-  }
-
-
-
-function setEvent(title, description, start, end,color, connection ) {
-    connection.query('INSERT INTO  Event  (title , description , start , end , color ) values ("'
-    + title +'", "' + description + '", "' + start +'", "' +  end+ '", "' +  color +'")', 
-        function (error, results) {
-        if (error) throw error;     
-    }); 
-    
 }
 
-  
+function setEvent(user, title, description, start, end, color, userIds, connection) {
+  var query = 'INSERT INTO  Event  (userid, title, description, start, end, color) values (' + user + ', "' + title + '", "' + description + '", "' + start + '", "' + end + '", "' + color + '")';
+  connection.query(query, function (error, response) {
+    for (userIndex = 0; userIndex < userIds.length; userIndex++) {
+      var query = 'INSERT INTO  invited  (userid, eventid) values (' + userIds[userIndex] + ', ' + response.insertId+ ')';
+      var invite = connection.query(query);
+    }
+  });
+}
 
-module.exports= {connection : dbConnect(), setEvent: setEvent};
+function updateEvent(id, title, description, start, end, userIds, connection) {
+  var query = 'UPDATE Event  SET  title= "' + title + '", description= "' + description +'", start= "' + start +  '", end="' + end + '" where id=' + id;
+  connection.query(query, function (error, response) {
+    var deleteQuery = 'DELETE FROM invited where eventid=' + id;
+    var deleteInvite = connection.query(deleteQuery);
+    if (userIds !== []) {
+      for (userIndex = 0; userIndex < userIds.length; userIndex++) {
+        var query = 'INSERT INTO  invited  (userid, eventid) values (' + userIds[userIndex] + ', ' + id + ')';
+        var invite = connection.query(query);
+      }
+    }
+  });
+}
+
+module.exports = {
+  connection: dbConnect(),
+  setEvent: setEvent,
+  updateEvent: updateEvent
+};

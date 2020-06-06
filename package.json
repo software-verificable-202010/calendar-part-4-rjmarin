@@ -14,7 +14,8 @@
     "demo"
   ],
   "devDependencies": {
-    "electron": "^8.2.1"
+    "electron": "^8.2.1",
+    "mocha": "^7.2.0"
   },
   "dependencies": {
     "bootstrap": "^4.4.1",

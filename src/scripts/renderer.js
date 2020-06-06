@@ -1,13 +1,12 @@
 const {
   remote,
-  ipcRenderer,
+  ipcRenderer
 } = require('electron');
 const BrowserWindow = remote.BrowserWindow;
-const path = require('path');
 const ipc = ipcRenderer;
-const dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SUT", "SUN"];
-const monthNames = ["January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
+const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SUT', 'SUN'];
+const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
 ];
 const INITIAL_YEAR = 1990;
 const FINAL_YEAR = 2030;
@@ -17,11 +16,15 @@ const SUNDAY_POSITION = 6;
 const WEEK_ROWS = 6;
 const DAYS = 7;
 const HOURS = 24;
-let today = new Date();
-let currentMonth = today.getMonth();
-let currentYear = today.getFullYear();
-let currentWeek = today.getDate();
-var calendarType = 0; //0 = month; 1= week
+var today = new Date();
+var currentMonth = today.getMonth();
+var currentYear = today.getFullYear();
+var currentWeek = today.getDate();
+var calendarType = 0;
+var weekCalendarType = 1;
+var monthCalendarType = 0;
+var user;
+getUser();
 monthSelect();
 yearSelect();
 changeCalendar();
@@ -31,7 +34,7 @@ nextWeek();
 previousWeek();
 
 /**************UTILS FUNCTIONS*************/
-function getDaysInWeek(fromDate) {
+function getDaysInWeek (fromDate) {
   var sundayOfThisWeek = new Date(fromDate.setDate(fromDate.getDate() + (DAYS - fromDate.getDay()))),
     result = [new Date(sundayOfThisWeek)];
   while (sundayOfThisWeek.setDate(sundayOfThisWeek.getDate() - 1) && sundayOfThisWeek.getDay() !== 0) {
@@ -40,12 +43,17 @@ function getDaysInWeek(fromDate) {
   return result.reverse();
 }
 
-function daysInMonths(month, year) {
+function daysInMonths (month, year) {
   return new Date(year, month, FIRST_DAY).getDate();
 }
 
+function   getUser () {
+  user = ipc.sendSync('user-logged');  
+  console.log(user);
+  
+}
 
-function currentDate(date) {
+function currentDate (date) {
   currentMonth = date.getMonth();
   currentYear = date.getFullYear();
   currentWeek = date.getDate();
@@ -53,43 +61,44 @@ function currentDate(date) {
 /*********************END UTILS**************/
 
 /*********************MODAL******************/
-function createModal() {
+function createModal () {
   const windowModal = new BrowserWindow({
     width: 500,
-    height: 400,
+    height: 500,
     modal: true,
     parent: remote.getCurrentWindow(),
     show: false,
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: true
     }
   });
   return windowModal;
 }
 
-function openModal() {
+function openModal (eventId) {
+  console.log(eventId);
+  ipc.send('event-request', eventId);
   windowModal = createModal();
   windowModal.loadFile('src/views/modalEvent.html');
   windowModal.show();
-  windowModal.on('closed', () => {
-    if(calendarType){
-      createCalendarWeek(currentMonth,currentYear,currentWeek);
-    }else{
-      createCalendarMonth(currentMonth,currentYear);
+  windowModal.on('closed', function () {
+    if (calendarType === weekCalendarType) {
+      createCalendarWeek(currentMonth, currentYear, currentWeek);
+    } else {
+      createCalendarMonth(currentMonth, currentYear);
     }
   });
 }
 /*****************END-MODAL****************/
 
-
 /*************HEADER FUNCTION**********/
-function getHeaderCalendar(CalendarType, day) {
+function getHeaderCalendar (CalendarType, day) {
   week = getDaysInWeek(day);
   if (CalendarType) {
     headerDay = document.getElementById('calendar-header').childNodes;
     for (divHeaderIndex = 1; divHeaderIndex < headerDay.length; divHeaderIndex += 2) {
       weekIndex = divHeaderIndex / 2 - 0.5;
-      headerDay[divHeaderIndex].innerText = dayNames[week[weekIndex].getDay()] + "\n" + week[weekIndex].getDate();
+      headerDay[divHeaderIndex].innerText = dayNames[week[weekIndex].getDay()] + '\n' + week[weekIndex].getDate();
     }
   } else {
     headerDay = document.getElementById('calendar-header').childNodes;
@@ -105,64 +114,60 @@ function getHeaderCalendar(CalendarType, day) {
 
 /*****************SELECTS AND BUTTON FUNCTION***********/
 
-function changeCalendar() {
+function changeCalendar () {
   changeToWeekCalendarBtn = document.getElementById('change-to-week');
   changeToWeekCalendarBtn.addEventListener('click', function () {
-    calendarType = 1;
+    calendarType = weekCalendarType;
     createCalendarWeek(currentMonth, currentYear, new Date().getDate());
     navegateCalendar();
   });
   changeToMonthCalendarBtn = document.getElementById('change-to-month');
   changeToMonthCalendarBtn.addEventListener('click', function () {
-    calendarType = 0;
+    calendarType = monthCalendarType;
     createCalendarMonth(currentMonth, currentYear);
     navegateCalendar();
   });
-
 }
 
-function navegateCalendar() {
+function navegateCalendar () {
   if (calendarType) {
-    document.getElementById("navegation-week").style.display = "inline";
-    document.getElementById('navegation').style.display = "none";
-
+    document.getElementById('navegation-week').style.display = 'inline';
+    document.getElementById('navegation').style.display = 'none';
   } else {
-    document.getElementById("navegation-week").style.display = "none";
-    document.getElementById('navegation').style.display = "block";
+    document.getElementById('navegation-week').style.display = 'none';
+    document.getElementById('navegation').style.display = 'block';
   }
-
-
 }
+
 /*****MONTH SELECT**********/
-function onChangeMonth() {
-  selectedMonth = document.getElementById("select-month");
+function onChangeMonth () {
+  selectedMonth = document.getElementById('select-month');
   currentMonth = parseInt(selectedMonth.value);
   createCalendarMonth(currentMonth, currentYear);
 }
 
-function monthSelect() {
-  let selectMonth = document.getElementById("select-month");
+function monthSelect () {
+  var selectMonth = document.getElementById('select-month');
   for (var index in monthNames) {
-    let option = document.createElement("option");
-    option.setAttribute("value", index);
+    var option = document.createElement('option');
+    option.setAttribute('value', index);
     option.innerHTML = monthNames[index];
     selectMonth.appendChild(option);
   }
-
 }
 
 /*****YEAR SELECT**********/
-function onChangeYear() {
-  selectedYear = document.getElementById("select-year");
+function onChangeYear () {
+  selectedYear = document.getElementById('select-year');
   currentYear = parseInt(selectedYear.value);
   createCalendarMonth(currentMonth, currentYear);
 }
 
-function yearSelect() {
-  let selectYear = document.getElementById("select-year");
-  for (let year = INITIAL_YEAR; year <= FINAL_YEAR; year++) {
-    let option = document.createElement("option");
-    option.setAttribute("value", year);
+function yearSelect () {
+  var selectYear = document.getElementById('select-year');
+  for (var year = INITIAL_YEAR; year <= FINAL_YEAR; year++) {
+    var option = document.createElement('option');
+    option.setAttribute('value', year);
     option.innerHTML = year;
     selectYear.appendChild(option);
   }
@@ -187,48 +192,47 @@ function previousWeek() {
 /**************END CLICKED FUCTIONS***************/
 
 /**************CREATE CALENDAR**********************/
-function createCalendarMonth(month, year) {
-
+function createCalendarMonth (month, year) {
   getHeaderCalendar(calendarType, new Date());
   date = new Date(year, month);
-  document.getElementById("current-month").innerText = monthNames[month] + " " + year;
+  document.getElementById('current-month').innerText = monthNames[month] + ' ' + year;
   // first day of the week order by monday to sunday
-  let firstDay = date.getDay() - 1;
+  var firstDay = date.getDay() - 1;
   if (firstDay === SUNDAY_VALUE) { //changing de postion of Sunday
     firstDay = SUNDAY_POSITION;
   }
-  let daysInMonth = daysInMonths(month + 1, year);
-  let bodyCalendar = document.getElementById("calendar__month");
-  // clearing data
-  bodyCalendar.innerHTML = "";
-  let dayCounter = 1;
-  let classDays = ["calendar__day", "day"];
-  for (let weeks = 0; weeks < WEEK_ROWS; weeks++) {
+  var daysInMonth = daysInMonths(month + 1, year);
+  var bodyCalendar = document.getElementById('calendar__month');
+  bodyCalendar.innerHTML = '';
+  var dayCounter = 1;
+  var classDays = ['calendar__day', 'day'];
+  for (var weeks = 0; weeks < WEEK_ROWS; weeks++) {
     if (dayCounter > daysInMonth) {
       break;
     }
-    let week = document.createElement("div");
-    week.className = "calendar__week";
-    for (let days = 0; days < DAYS; days++) {
-      let day = document.createElement("div");
+    var week = document.createElement('div');
+    week.className = 'calendar__week';
+    for (var days = 0; days < DAYS; days++) {
+      var day = document.createElement('div');
       day.classList.add(...classDays);
       day.id = new Date(currentYear, currentMonth, dayCounter);
-      day.setAttribute("onclick", "openModal()");
-      if (days == 5 || days == 6) {
-        day.classList.add("weekend");
+      //day.setAttribute('onclick', 'openModal()');
+      if (days === 5 || days === 6) {
+        day.classList.add('weekend');
       }
+      var dayNumber;
       if (weeks === 0 && days < firstDay || dayCounter > daysInMonth) {
-        let dayNumber = document.createTextNode("");
+        dayNumber = document.createTextNode('');
         day.appendChild(dayNumber);
         week.appendChild(day);
       } else {
-        let dayNumber = document.createTextNode(dayCounter);
+        dayNumber = document.createTextNode(dayCounter);
         day.appendChild(dayNumber);
         week.appendChild(day);
         dayCounter++;
       }
     }
-    bodyCalendar.appendChild(week); // appending each row into calendar body.
+    bodyCalendar.appendChild(week); 
   }
   fillEventMonth();
 }
@@ -239,37 +243,34 @@ function createCalendarWeek(month, year, weekIndex) {
   week = getDaysInWeek(new Date(year, month, weekIndex));
   currentDate(date);
   getHeaderCalendar(calendarType, new Date(year, month, weekIndex));
-  document.getElementById("current-month").innerText = monthNames[currentMonth] + " " + currentYear;
-  let bodyCalendar = document.getElementById("calendar__month");
-  bodyCalendar.innerHTML = ""; // clearing data
-  var classDays = ["calendar__day", "day"];
-  for (let hour = 0; hour < HOURS; hour++) {
-    var hours = document.createElement("div");
-    for (let days = 0; days < DAYS; days++) {
-      hours.className = "calendar__hour";
-      let day = document.createElement("div");
+  document.getElementById('current-month').innerText = monthNames[currentMonth] + ' ' + currentYear;
+  var bodyCalendar = document.getElementById('calendar__month');
+  bodyCalendar.innerHTML = ''; 
+  var classDays = ['calendar__day', 'day'];
+  for (var hour = 0; hour < HOURS; hour++) {
+    var hours = document.createElement('div');
+    for (var days = 0; days < DAYS; days++) {
+      hours.className = 'calendar__hour';
+      var day = document.createElement('div');
       day.classList.add(...classDays);
       day.id = new Date(currentYear, currentMonth, week[days].getDate(), hour);
-      day.setAttribute("onclick", "openModal()");
-      if (days == 0) {
-        day.innerText = hour + " hrs";
+      if (days === 0) {
+        day.innerText = hour + ' hrs';
       }
-      if (days == 5 || days == 6) {
-        day.classList.add("weekend");
+      if (days === 5 || days === 6) {
+        day.classList.add('weekend');
       }
       hours.appendChild(day);
     }
-    bodyCalendar.appendChild(hours); // appending each row into calendar body.
+    bodyCalendar.appendChild(hours); 
   }
   fillEventWeek();
 }
 /**************END CALENDAR**************/
 
 /**************FILL EVENTT***************/
-
-//fill all events in calendar type of week
-function fillEventMonth() {
-  var events = ipc.sendSync('get-event');
+function fillEventMonth () {
+  var events = ipc.sendSync('get-events');
   for (eventIndex = 0; eventIndex < events.length; eventIndex++) {
     var event = events[eventIndex];
     var start = new Date(event.start);
@@ -282,15 +283,19 @@ function fillEventMonth() {
     eventElement.style.background = event.color;
     eventElement.classList = ['text-left'];
     eventTitle = document.createElement('span');
-    eventElement.innerHTML = start.getHours() + ":" + start.getMinutes() + " " + event.title;
+    eventElement.innerHTML = start.getHours() + ':' + start.getMinutes() + ' ' + event.title;
     eventElement.appendChild(eventTitle);
+    eventElement.id = events[eventIndex].id;
+    if (events[eventIndex].userid === user.id) {
+      console.log(events[eventIndex].userid, user.id);
+      eventElement.setAttribute('onclick', 'openModal(' + events[eventIndex].id + ')');
+    }
     divDay.appendChild(eventElement);
   }
-
 }
-//fill all events in calendar type of week
+
 function fillEventWeek() {
-  var events = ipc.sendSync('get-event');
+  var events = ipc.sendSync('get-events');
   for (eventIndex = 0; eventIndex < events.length; eventIndex++) {
     var event = events[eventIndex];
     var start = new Date(event.start);
@@ -301,25 +306,22 @@ function fillEventWeek() {
       if (!divDay) {
         continue;
       }
-      var textEvent = start.getHours() + ":" + start.getMinutes() + " - " + end.getHours() + ":" + end.getMinutes() + "  " + event.title;
+      var textEvent = start.getHours() + ':' + start.getMinutes() + ' - ' + end.getHours() + ':' + end.getMinutes() + '  ' + event.title;
       eventElement = document.createElement('div');
       eventElement.style.background = event.color;
       eventElement.classList = ['text-left'];
       eventTitle = document.createElement('span');
-      eventElement.id = textEvent;
+      eventElement.id = events[eventIndex].id;
       eventElement.innerHTML = textEvent;
       eventElement.appendChild(eventTitle);
+      if (events[eventIndex].userid === user.id) {
+        console.log(events[eventIndex].userid, user.id);
+        
+        eventElement.setAttribute('onclick', 'openModal(' + events[eventIndex].id + ')');
+      }
       divDay.appendChild(eventElement);
-      
-
-
     }
   }
 
 }
 
-ipc.on('sync-event', (e, arg) => {
-  console.log("entry", arg);
-  fillEventMonth();
-  fillEventWeek();
-});
