@@ -82,6 +82,17 @@ function getEvent() {
             var deleteBtn = document.getElementById('delete-event');
             deleteBtn.disabled = false;   
     }); 
+    ipc.on('guest', function (e, guests) {
+        var stringGuests = "";
+        if (guests.length > 0) {
+            guests.map(function (guest) {
+                stringGuests = stringGuests.concat(guest.userid, ",");
+            });
+            if (eventId > 0) {
+                document.getElementById('guest').value = stringGuests;
+            }
+        }
+    });
 }
 
 function deleteEvent () {
@@ -97,10 +108,9 @@ function deleteEvent () {
 }
 
 function emptyInputs () {
-    console.log("`limpiando");
-    
+    document.getElementById('guest').value = '';
     document.getElementById('title').value = '';
     document.getElementById('description').value = '';
     document.getElementById('starts-at').value = '';
-    document.getElementById('ends-at').value = '';
+    document.getElementById('ends-at').value = '';   
 }

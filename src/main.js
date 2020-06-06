@@ -94,13 +94,20 @@ ipcMain.on('delete-event', function (e, id) {
 }); 
 
 ipcMain.on('event-request', function (e, id) {
+  var guests;
   connection.query('Select * FROM  event where id = ' + id,
   function (error, results ) {
     if (error) throw error;  
     event = results;
     if ( event.length > 0){
+      query = 'Select userid from invited where eventid=' + id;
+      connection.query(query, function (err, results) {
+        if (error) throw error;  
+        guests = results;
+      });
       ipcMain.on('get-window-request', function (e) {
         e.sender.send('event', event);
+        e.sender.send('guest', guests);
       });
     } else {
       e.sender.send('event', []);  
