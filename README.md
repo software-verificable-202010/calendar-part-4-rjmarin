@@ -8,6 +8,26 @@ A basic Electron application needs just these files:
 
 You can learn more about each of these components within the [Quick Start Guide](https://electronjs.org/docs/tutorial/quick-start).
 
+## Rules with jshint
+```bash 
+{
+    "jshint.options": {
+        "esversion": 6
+    },
+    "editor.formatOnSave": true,
+    "prettier.requireConfig": true,
+    "files.autoSave": "afterDelay",
+    "window.zoomLevel": 2,
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "prettier.singleQuote": true,
+    "prettier.quoteProps": "consistent",
+    "prettier.trailingComma": "es5",
+    "prettier.useTabs": true,
+    "prettier.vueIndentScriptAndStyle": true,
+    "jshint.reportWarningsAsErrors": true,
+}
+```
+
 ## To Use
 
 To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:

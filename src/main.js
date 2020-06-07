@@ -1,6 +1,6 @@
 // Modules to control application life and create native browser window
-const  { app, BrowserWindow, ipcMain, remote } = require('electron');
-const path = require('path');
+const  { app, BrowserWindow, ipcMain } = require('electron');
+const  path = require('path');
 const  connection  = require(path.resolve('src/scripts/dbProvider.js')).connection;
 const  setEvent  = require(path.resolve('src/scripts/dbProvider.js')).setEvent;
 const  updateEvent  = require(path.resolve('src/scripts/dbProvider.js')).updateEvent;
