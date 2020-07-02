@@ -43,4 +43,6 @@ cd calendar-app
 npm install
 # Run the app
 npm start
+# Test the app
+yarn coverage
 ```

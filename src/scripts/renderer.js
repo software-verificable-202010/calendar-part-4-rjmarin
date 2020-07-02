@@ -2,20 +2,20 @@ const {
   remote,
   ipcRenderer
 } = require('electron');
+const  path = require('path');
 const BrowserWindow = remote.BrowserWindow;
 const ipc = ipcRenderer;
 const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SUT', 'SUN'];
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
-const INITIAL_YEAR = 1990;
-const FINAL_YEAR = 2030;
-const FIRST_DAY = 0;
 const SUNDAY_VALUE = -1;
 const SUNDAY_POSITION = 6;
 const WEEK_ROWS = 6;
 const DAYS = 7;
 const HOURS = 24;
+const saturday = 5;
+const sunday = 6;
 var today = new Date();
 var currentMonth = today.getMonth();
 var currentYear = today.getFullYear();
@@ -24,6 +24,10 @@ var calendarType = 0;
 var weekCalendarType = 1;
 var monthCalendarType = 0;
 var user;
+const  daysInMonths  = require(path.resolve('src/scripts/utils/rendererUtils')).daysInMonths;
+const  getDaysInWeek  = require(path.resolve('src/scripts/utils/rendererUtils')).getDaysInWeek;
+const  monthSelect  = require(path.resolve('src/scripts/utils/rendererUtils')).monthSelect;
+const  yearSelect  = require(path.resolve('src/scripts/utils/rendererUtils')).yearSelect;
 getUser();
 monthSelect();
 yearSelect();
@@ -34,23 +38,9 @@ nextWeek();
 previousWeek();
 
 /**************UTILS FUNCTIONS*************/
-function getDaysInWeek (fromDate) {
-  var sundayOfThisWeek = new Date(fromDate.setDate(fromDate.getDate() + (DAYS - fromDate.getDay()))),
-    result = [new Date(sundayOfThisWeek)];
-  while (sundayOfThisWeek.setDate(sundayOfThisWeek.getDate() - 1) && sundayOfThisWeek.getDay() !== 0) {
-    result.push(new Date(sundayOfThisWeek));
-  }
-  return result.reverse();
-}
-
-function daysInMonths (month, year) {
-  return new Date(year, month, FIRST_DAY).getDate();
-}
-
 function   getUser () {
   user = ipc.sendSync('user-logged');  
   console.log(user);
-  
 }
 
 function currentDate (date) {
@@ -106,14 +96,10 @@ function getHeaderCalendar (CalendarType, day) {
       dayIndex = divHeaderIndex / 2 - 0.5;
       headerDay[divHeaderIndex].innerText = dayNames[week[dayIndex].getDay()];
     }
-
   }
-
 }
 
-
 /*****************SELECTS AND BUTTON FUNCTION***********/
-
 function changeCalendar () {
   changeToWeekCalendarBtn = document.getElementById('change-to-week');
   changeToWeekCalendarBtn.addEventListener('click', function () {
@@ -139,38 +125,17 @@ function navegateCalendar () {
   }
 }
 
-/*****MONTH SELECT**********/
+/*****SELECT ON CHANGE**********/
 function onChangeMonth () {
   selectedMonth = document.getElementById('select-month');
   currentMonth = parseInt(selectedMonth.value);
   createCalendarMonth(currentMonth, currentYear);
 }
 
-function monthSelect () {
-  var selectMonth = document.getElementById('select-month');
-  for (var index in monthNames) {
-    var option = document.createElement('option');
-    option.setAttribute('value', index);
-    option.innerHTML = monthNames[index];
-    selectMonth.appendChild(option);
-  }
-}
-
-/*****YEAR SELECT**********/
 function onChangeYear () {
   selectedYear = document.getElementById('select-year');
   currentYear = parseInt(selectedYear.value);
   createCalendarMonth(currentMonth, currentYear);
-}
-
-function yearSelect () {
-  var selectYear = document.getElementById('select-year');
-  for (var year = INITIAL_YEAR; year <= FINAL_YEAR; year++) {
-    var option = document.createElement('option');
-    option.setAttribute('value', year);
-    option.innerHTML = year;
-    selectYear.appendChild(option);
-  }
 }
 
 function nextWeek() {
@@ -188,7 +153,6 @@ function previousWeek() {
     createCalendarWeek(currentMonth, currentYear, currentWeek);
   });
 }
-
 /**************END CLICKED FUCTIONS***************/
 
 /**************CREATE CALENDAR**********************/
@@ -216,8 +180,7 @@ function createCalendarMonth (month, year) {
       var day = document.createElement('div');
       day.classList.add(...classDays);
       day.id = new Date(currentYear, currentMonth, dayCounter);
-      //day.setAttribute('onclick', 'openModal()');
-      if (days === 5 || days === 6) {
+      if (days === saturday || days === sunday) {
         day.classList.add('weekend');
       }
       var dayNumber;
@@ -257,7 +220,7 @@ function createCalendarWeek(month, year, weekIndex) {
       if (days === 0) {
         day.innerText = hour + ' hrs';
       }
-      if (days === 5 || days === 6) {
+      if (days === saturday || days === sunday) {
         day.classList.add('weekend');
       }
       hours.appendChild(day);
@@ -322,6 +285,5 @@ function fillEventWeek() {
       divDay.appendChild(eventElement);
     }
   }
-
 }
 

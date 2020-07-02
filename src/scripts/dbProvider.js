@@ -13,26 +13,26 @@ function dbConnect() {
       return error;
     }
   });
-  connection.query('USE calendar',
-    function (error) {
-      if (error) throw error;
-    });
+  connection.query('USE calendar');
   return connection;
 }
 
 function setEvent(user, title, description, start, end, color, userIds, connection) {
   var query = 'INSERT INTO  Event  (userid, title, description, start, end, color) values (' + user + ', "' + title + '", "' + description + '", "' + start + '", "' + end + '", "' + color + '")';
-  connection.query(query, function (error, response) {
-    for (userIndex = 0; userIndex < userIds.length; userIndex++) {
-      var query = 'INSERT INTO  invited  (userid, eventid) values (' + userIds[userIndex] + ', ' + response.insertId+ ')';
-      var invite = connection.query(query);
+  connection.query(query, function (response) {
+    if (userIds !== []) {
+      for (userIndex = 0; userIndex < userIds.length; userIndex++) {
+        var query = 'INSERT INTO  invited  (userid, eventid) values (' + userIds[userIndex] + ', ' + response.insertId+ ')';
+        var invite = connection.query(query);
+      }
     }
   });
+  return 0;
 }
 
 function updateEvent(id, title, description, start, end, userIds, connection) {
   var query = 'UPDATE Event  SET  title= "' + title + '", description= "' + description +'", start= "' + start +  '", end="' + end + '" where id=' + id;
-  connection.query(query, function (error, response) {
+  connection.query(query, function () {
     var deleteQuery = 'DELETE FROM invited where eventid=' + id;
     var deleteInvite = connection.query(deleteQuery);
     if (userIds !== []) {
@@ -42,6 +42,7 @@ function updateEvent(id, title, description, start, end, userIds, connection) {
       }
     }
   });
+  return 0;
 }
 
 module.exports = {
