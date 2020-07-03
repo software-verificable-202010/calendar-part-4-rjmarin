@@ -46,3 +46,10 @@ npm start
 # Test the app
 yarn coverage
 ```
+
+# Results
+Static analitics:
+![alt text](static.png)
+
+Coverage:
+![alt text](coverage.png)
